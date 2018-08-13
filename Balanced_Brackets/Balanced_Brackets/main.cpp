@@ -12,14 +12,14 @@
 using namespace std;
 
 /* Static function prototypes */
-static bool isSequenceBalanced(string seq);
+static void isSequenceBalanced(string seq);
 
 int main(){
    uint32 num_of_sequences = 0;
    std::vector<std::string> vSequence; /* vector of sequences */
 
    /* Request the user for number of sequences */
-   cout<<"Enter the number of sequences: ";
+   /*cout<<"Enter the number of sequences: ";*/
    cin>>num_of_sequences;
 
    /* Bounds checking of number of sequences */
@@ -31,7 +31,7 @@ int main(){
    /* Request the user for the sequence */
    for(uint32 iStr=0; iStr<num_of_sequences; iStr++){
       std::string inpSequence;
-      cout<<"Enter string "<<iStr+1<<": ";
+      /*cout<<"Enter string "<<iStr+1<<": "; */
       cin>>inpSequence; /* using 'cin' assuming that the user will enter a sequence without space */
 
       uint32 sequence_length = strlen(inpSequence.c_str());
@@ -55,65 +55,47 @@ int main(){
    /* Run through the sequences in the vector */
    for(std::vector<std::string>::iterator it = vSequence.begin(); it != vSequence.end(); ++it){
       /* Check if the sequence is balanced */
-      if(TRUE == isSequenceBalanced(*it)){
-         cout<<"YES"<<endl;
-      }
-      else{
-         cout<<"NO"<<endl;
-      }
+      isSequenceBalanced(*it);
    }
 
    return 0;
 }
 
-static bool isSequenceBalanced(string seq){
-   bool retVal = TRUE;
-   stack<char> charStack; /* Character stack to hold characters */
+static void isSequenceBalanced(string seq){
+   uint32 seq_len = seq.length();
 
-   /* Run through the characters in the sequence */
-   for(uint32 iSeq=0; iSeq<seq.length(); ++iSeq){
-      char tChar = seq[iSeq];
+   /* This function will never be called if sequence length is less than 1.
+   If the sequence length is 1, then it is unbalanced. If it is 2, then the 
+   sequence could be balanced or unbalanced. If it is , then it is unbalanced.
+   If it is 4, then the sequence could be balanced or unbalanced. */
 
-      /* Check if the character is one of the opening brackets */
-      if(TRUE == isOpeningBracket(tChar)){
-         /* push the character to the stack */
-         charStack.push(tChar);
-      }
-      /* Check if the character is one of the closing brackets */
-      else if(TRUE == isClosingBracket(tChar)){
-         /* Now check if the stack is empty. If TRUE, it means we have a closing bracket in the sequence 
-         without an opening bracket and hence the sequence is unbalanced */
-         if(TRUE == charStack.empty()){
-            retVal = FALSE;
-            break;
-         }
-         /* If the stack is not empty, then comapre the current closing bracket with the last inserted
-         opening bracket in the stack. If they don't match then the sequence is unbalanced  */
-         else if(FALSE == areBracketsBalanced(charStack.top(), tChar)){
-            retVal = FALSE;
-            break;
-         }
-         /* If the stack is not empty and if the current closing bracket and the last inserted
-         opening bracket in the stack matchs, then remove the last inserted opening bracket from
-         the stack */
-         else{
-            charStack.pop();
-         }
-      }
-      else{
-         /* Do nothing */
-      }
+   /* Check if sequence length is odd or even. If it is odd, then it is definitely unbalanced */
+   if(0 != (seq_len%2)){
+      cout<<"NO"<<endl;
    }
-
-   /* Even after running through the whole sequence, if the stack is not empty, then there
-   is an opening bracket without a matching closing bracket and hence the sequence is 
-   unbalanced */
-   if(FALSE == charStack.empty()){
-      retVal = FALSE;
-   }
+   /* If it is even, the sequence could be balanced or unbalanced */
    else{
-      /* Do nothing */
+      /* extract the first and last characters of the string */
+      char firstChar = seq[0];
+      char lastChar = seq[seq_len-1];
+      
+      /* If the first and last characters of the sequence are balanced, then check if the sub-string 
+      in between is also balanced. */
+      if(TRUE == areBracketsBalanced(firstChar, lastChar)){
+         /* If the sequence was only of two characters then it is balanced */
+         if(2 == seq_len){
+            cout<<"YES"<<endl;
+         }
+         else{
+            /* If the sequence was of more than 2 characters then strip the first and last
+            characters of the string and check if the sub-string is balanced */
+            seq = seq.substr(1, seq.length()-2);
+            isSequenceBalanced(seq);
+         }
+      }
+      /* If the first and last characters of the sequence are not balanced, then the sequence is unbalanced */
+      else{
+         cout<<"NO"<<endl;
+      }
    }
-
-   return retVal;
 }
